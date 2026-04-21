@@ -70,7 +70,7 @@ export default {
 .services-hero { 
   padding:100px 50px; 
   text-align:center; 
-  background: linear-gradient(135deg, #000 0%, #111 100%);
+  background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
   min-height:100vh;
   display:flex;
   flex-direction:column;

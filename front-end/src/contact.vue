@@ -122,7 +122,7 @@ fetch('http://localhost:3001/api/contact', {
 .contact {
   padding:100px 50px;
   min-height:100vh;
-  background: radial-gradient(ellipse at top, #111 0%, #000 80%);
+   background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
 }
 .contact-container {
   max-width:800px;

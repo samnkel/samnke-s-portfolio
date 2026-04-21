@@ -64,7 +64,7 @@ export default {
 <style scoped>
 .projects-hero { 
   padding:100px 50px; 
-  background: radial-gradient(ellipse at center, #111 0%, #000 70%);
+ background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
   min-height:100vh;
 }
 .projects-header { 
