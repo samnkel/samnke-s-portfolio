@@ -418,15 +418,18 @@ body { margin:0; }
 @media (max-width: 1024px) {
   .hamburger { display: block; }
   .nav-links { 
+    display: none;
     position: absolute;
     top: 100%; left: 0; right: 0;
     background: #000;
     flex-direction: column;
     padding: 1rem 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .nav-links.mobile-open { 
+    display: flex;
     animation: slideDown 0.3s ease;
   }
-  .nav-links.mobile-open { display: flex; }
   .nav-link { padding: 1rem 2rem; border-bottom: 1px solid #333; width: 100%; text-align: center; }
   .nav-link:last-child { border-bottom: none; }
   .btn { padding: 12px 24px; font-size: 14px; }
