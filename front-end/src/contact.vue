@@ -108,7 +108,7 @@ const handleSubmit = async () => {
 
     status.value = {
       type: 'success',
-      message: '📧 Email client opened with your message! Please click SEND in your email app.'
+      message: '📧 Email client opened with your message. Please click SEND in your email app.'
     }
     formData.value = { fullName: '', phone: '', email: '', message: '' }
   } finally {
