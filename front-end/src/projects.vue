@@ -63,8 +63,8 @@ export default {
 
 <style scoped>
 .projects-hero { 
-  padding:100px 50px; 
- background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
+  padding: clamp(3rem, 8vh, 6rem) clamp(2rem, 6vw, 3rem); 
+  background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
   min-height:100vh;
 }
 .projects-header { 
@@ -86,9 +86,9 @@ export default {
 }
 .projects-grid { 
   display:grid; 
-  grid-template-columns:repeat(auto-fit, minmax(350px, 1fr)); 
-  gap:40px; 
-  margin-bottom:80px;
+  grid-template-columns:repeat(auto-fit, minmax(clamp(280px, 100%, 350px), 1fr)); 
+  gap: clamp(1.5rem, 6vh, 2.5rem); 
+  margin-bottom: clamp(3rem, 10vh, 5rem);
 }
 .project-card { 
   background:#111; 
@@ -168,9 +168,19 @@ export default {
   color:#00ff99; 
   border:1px solid #00ff99;
 }
+@media (max-width: 1024px) {
+  .projects-grid { gap: 1.5rem; }
+}
+
 @media (max-width: 768px) {
   .projects-hero { padding:60px 20px; }
   .projects-grid { grid-template-columns:1fr; }
+}
+
+@media (max-width: 480px) {
+  .projects-title { font-size: clamp(2rem, 8vw, 3rem); }
+  .project-card { margin-bottom: 1rem; }
+  .project-btn { padding: 12px 24px; font-size: 15px; min-height: 48px; }
 }
 </style>
 

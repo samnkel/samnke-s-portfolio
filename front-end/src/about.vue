@@ -92,7 +92,8 @@ export default {
   align-items:center;
   justify-content:center;
   overflow:hidden;
-   background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
+  padding: clamp(2rem, 5vh, 4rem) clamp(1rem, 5vw, 2rem);
+  background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
 }
 .hero-container {
   width:100%;
@@ -121,7 +122,7 @@ export default {
   letter-spacing:3px;
 }
 .title { 
-  font-size:65px; 
+  font-size: clamp(2.8rem, 10vw, 4.1rem); 
   font-weight:bold; 
   line-height:0.95; 
   margin:0 0 25px 0;
@@ -193,8 +194,9 @@ export default {
   backdrop-filter:blur(20px);
   border:1px solid rgba(0,255,153,0.2);
   border-radius:25px;
-  padding:40px;
-  min-height:450px;
+  padding: clamp(1.5rem, 6vw, 2.5rem);
+  min-height: clamp(350px, 50vh, 450px);
+  max-width: 100%;
 }
 .skill-item {
   display:flex;
@@ -213,9 +215,21 @@ export default {
   font-weight:bold;
 }
 
-@media (max-width:768px) {
-  .hero-wrapper { flex-direction:column; gap:30px; text-align:center; }
-  .title { font-size:50px; }
-  .cta { justify-content:center; flex-wrap:wrap; }
+/* RESPONSIVE Enhanced */
+@media (max-width: 1024px) {
+  .hero-wrapper { 
+    flex-direction: column; 
+    gap: clamp(1.5rem, 6vh, 2.5rem); 
+    text-align:center; 
+  }
+  
+  .skills-panel {
+    margin-top: 2rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome { font-size: clamp(0.875rem, 3vw, 1.125rem); }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
-  <div class="app">
+<div class="app">
+    <LoadingSpinner />
     <nav class="nav">
       <div class="logo">
         <div class="logo-circle" :class="{ flipping: isFlipping }">
@@ -7,14 +8,16 @@
         </div>
         <h3>Samnkelsiwe Mpiyonke</h3>
       </div>
-      <div class="nav-links">
+      <div class="nav-links" :class="{ 'mobile-open': showMobileNav }">
         <router-link to="/" class="nav-link">Home</router-link>
         <router-link to="/about" class="nav-link">About Me</router-link>
         <router-link to="/services" class="nav-link">Services</router-link>
         <router-link to="/projects" class="nav-link">Projects</router-link>
-        
       </div>
+      <button class="hamburger" @click="toggleMobileNav">☰</button>
+
       <button class="btn" @click="showContactModal = true">Get In Touch</button>
+
     </nav>
     
     <div class="nav-divider"></div>
@@ -29,10 +32,11 @@
           <button class="close-btn" @click="showContactModal = false">&times;</button>
         </div>
 
-        <form class="modal-form" @submit.prevent="submitForm">
+        <form class="modal-form" @submit.prevent="handleModalSubmit">
           <div class="form-group">
             <label for="modal-fullName">Full Name *</label>
             <input 
+              name="fullName"
               id="modal-fullName" 
               v-model="form.fullName" 
               type="text" 
@@ -44,6 +48,7 @@
           <div class="form-group">
             <label for="modal-phone">Contact Number *</label>
             <input 
+              name="phone"
               id="modal-phone" 
               v-model="form.phone" 
               type="tel" 
@@ -55,6 +60,7 @@
           <div class="form-group">
             <label for="modal-email">Email Address *</label>
             <input 
+              name="email"
               id="modal-email" 
               v-model="form.email" 
               type="email" 
@@ -66,6 +72,7 @@
           <div class="form-group">
             <label for="modal-message">Message *</label>
             <textarea 
+              name="message"
               id="modal-message" 
               v-model="form.message" 
               required
@@ -88,10 +95,17 @@
 </template>
 
 <script>
+import LoadingSpinner from './components/LoadingSpinner.vue'
+
 export default {
+  components: {
+    LoadingSpinner
+  },
+
   data() {
     return {
       isFlipping: false,
+      showMobileNav: false,
       showContactModal: false,
       form: {
         fullName: '',
@@ -103,10 +117,14 @@ export default {
       status: null
     }
   },
+
   mounted() {
     this.flipLogo();
   },
   methods: {
+    toggleMobileNav() {
+      this.showMobileNav = !this.showMobileNav;
+    },
     flipLogo() {
       const flip = () => {
         this.isFlipping = true;
@@ -117,39 +135,45 @@ export default {
       };
       flip();
     },
-    async submitForm() {
+    openMailtoFallback() {
+      const subject = encodeURIComponent(`Portfolio Contact: ${this.form.fullName}`)
+      const body = encodeURIComponent(
+        `Name: ${this.form.fullName}\n` +
+        `Phone: ${this.form.phone}\n` +
+        `Email: ${this.form.email}\n\n` +
+        `Message:\n${this.form.message}`
+      )
+      window.open(`mailto:samnkelisiwe@gmail.com?subject=${subject}&body=${body}`, '_blank')
+    },
+    handleModalSubmit(e) {
+      e.preventDefault();
+      if (!this.form.fullName || !this.form.email || !this.form.message) {
+        this.status = { type: 'error', message: 'Please fill required fields.' };
+        return;
+      }
       this.loading = true;
       this.status = null;
-
-      try {
-        const response = await fetch('http://localhost:3001/api/contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.form)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          this.form = { fullName: '', phone: '', email: '', message: '' };
-          this.status = {
-            type: 'success',
-            message: '✅ Message sent to Gmail! Reply within 24h.'
-          };
-        } else {
-          throw new Error(data.message || 'Server error');
-        }
-      } catch (error) {
-        console.error('Submit error:', error);
-        this.status = {
-          type: 'error',
-          message: '❌ Backend not running. Run: cd back-end && npm install && node server.js'
-        };
-      } finally {
-        this.loading = false;
+      const templateParams = {
+        from_name: this.form.fullName,
+        fullName: this.form.fullName,
+        name: this.form.fullName,
+        phone: this.form.phone,
+        contact_number: this.form.phone,
+        from_email: this.form.email,
+        email: this.form.email,
+        reply_to: this.form.email,
+        message: this.form.message
       }
+      emailjs.send('service_9pbccv5', 'template_kpdbvqu', templateParams).then(() => {
+        this.status = { type: 'success', message: '🎉 Message sent! I will reply soon.' };
+        this.form = { fullName: '', phone: '', email: '', message: '' };
+      }).catch(() => {
+        this.openMailtoFallback()
+        this.status = { type: 'success', message: '📧 Email client opened with your message! Please click SEND in your email app.' };
+        this.form = { fullName: '', phone: '', email: '', message: '' };
+      }).finally(() => {
+        this.loading = false;
+      });
     }
   }
 }
@@ -162,7 +186,7 @@ body { margin:0; }
   display:flex; 
   justify-content:space-between; 
   align-items:center; 
-  padding:20px 50px; 
+  padding: clamp(1rem, 4vw, 1.5rem) clamp(1rem, 5vw, 4rem); 
   position:sticky; 
   top:0; 
   background:#000; 
@@ -196,8 +220,23 @@ body { margin:0; }
 }
 .nav-links { 
   display:flex; 
-  gap:30px; 
+  gap: clamp(1rem, 3vw, 2rem); 
   position:relative;
+}
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: #fff;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+.hamburger:hover {
+  background: rgba(0,255,153,0.2);
 }
 .nav-link { 
   color:#fff; 
@@ -243,9 +282,7 @@ body { margin:0; }
   background:linear-gradient(90deg, transparent, #333 20%, #444 50%, #333 80%, transparent);
   margin:0;
   box-shadow:0 1px 3px rgba(0,0,0,0.5);
-}
-
-/* Modal Styles */
+} 
 .modal-overlay {
   position:fixed;
   top:0;
@@ -261,9 +298,9 @@ body { margin:0; }
 }
 .modal-content {
   background:#111;
-  padding:40px;
+  padding: clamp(1.5rem, 8vw, 2.5rem);
   border-radius:25px;
-  max-width:500px;
+  max-width: min(90vw, 500px);
   width:90%;
   max-height:90vh;
   overflow-y:auto;
@@ -280,7 +317,7 @@ body { margin:0; }
 }
 .modal-header h2 {
   margin:0;
-  font-size:28px;
+  font-size: clamp(1.5rem, 5vw, 1.75rem);
   color:#fff;
 }
 .close-btn {
@@ -340,10 +377,18 @@ body { margin:0; }
   font-size:16px;
   font-weight:bold;
   margin-top:10px;
+  background: linear-gradient(45deg, #00ff99, #00cc77);
+  border: none;
+  color: #000;
+  cursor: pointer;
+}
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0,255,153,0.4);
 }
 .submit-btn:disabled {
-  opacity:0.7;
-  cursor:not-allowed;
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 .status-message {
   margin-top:20px;
@@ -357,6 +402,11 @@ body { margin:0; }
   border:1px solid #00ff99;
   color:#00ff99;
 }
+.status-message.error {
+  background:rgba(255,64,95,0.1);
+  border:1px solid #ff4060;
+  color:#ff4060;
+}
 @keyframes fadeIn {
   from { opacity:0; }
   to { opacity:1; }
@@ -365,8 +415,36 @@ body { margin:0; }
   0% { transform:scale(0.7) translateY(50px); opacity:0; }
   100% { transform:scale(1) translateY(0); opacity:1; }
 }
-@media (max-width:768px) {
+@media (max-width: 1024px) {
+  .hamburger { display: block; }
+  .nav-links { 
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: #000;
+    flex-direction: column;
+    padding: 1rem 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    animation: slideDown 0.3s ease;
+  }
+  .nav-links.mobile-open { display: flex; }
+  .nav-link { padding: 1rem 2rem; border-bottom: 1px solid #333; width: 100%; text-align: center; }
+  .nav-link:last-child { border-bottom: none; }
+  .btn { padding: 12px 24px; font-size: 14px; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
   .nav { padding:15px 20px; }
   .modal-content { margin:20px; padding:30px 20px; }
+}
+
+@media (max-width: 480px) {
+  .logo-circle { width: 36px; height: 36px; font-size: 16px; }
+  .hamburger { font-size: 1.5rem; padding: 0.75rem; }
+  .btn { padding: 10px 20px; font-size: 13px; }
 }
 </style>

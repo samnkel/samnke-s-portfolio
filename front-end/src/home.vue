@@ -76,7 +76,7 @@
   justify-content: space-between;
   align-items: center;
   min-height: 100vh;
-  padding: 10px 13%;
+  padding: clamp(1rem, 3vw, 1.5rem) clamp(5%, 13%, 15%);
   background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
   color: #fff;
   overflow: hidden;
@@ -84,8 +84,8 @@
 
 /* LEFT SIDE */
 .hero-left {
-  max-width: 550px;
-  padding: 70px;
+  max-width: clamp(350px, 45vw, 550px);
+  padding: clamp(2rem, 8vw, 4.5rem);
   border-top: 3px solid  #00ff99;
   border-left:3px solid  #0a1f2f;
   border-bottom:3px solid #0a1f2f;
@@ -99,7 +99,7 @@
 }
 
 .title {
-  font-size: 64px;
+  font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 800;
   line-height: 1.1;
 }
@@ -141,8 +141,8 @@
 
 .socials {
   display: flex;
-  gap: 10px;
-  margin-left: 150px;
+  gap: clamp(0.5rem, 2vw, 1rem);
+  margin-left: clamp(8rem, 20vw, 9.5rem);
 }
 
 .icon svg {
@@ -190,8 +190,9 @@
 }
 
 .image-card {
-  position: flex;
-  width: 350px;
+  position: relative;
+  width: clamp(280px, 45vw, 350px);
+  max-width: 100%;
   border-radius: 20px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
@@ -248,15 +249,33 @@
   bottom: 40%;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
+/* RESPONSIVE - Enhanced */
+@media (max-width: 1024px) {
   .hero {
     flex-direction: column;
     text-align: center;
+    gap: clamp(2rem, 8vh, 4rem);
   }
-
+  
   .hero-right {
-    margin-top: 40px;
+    margin-top: 2rem;
+  }
+  
+  .socials {
+    margin-left: 0;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-left {
+    border-width: 2px;
+  }
+  
+  .floating {
+    font-size: 0.8rem;
+    padding: 0.5rem;
   }
 }
 </style>

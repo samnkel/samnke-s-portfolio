@@ -68,7 +68,7 @@ export default {
 
 <style scoped>
 .services-hero { 
-  padding:100px 50px; 
+  padding: clamp(4rem, 10vh, 6rem) clamp(2rem, 6vw, 3rem); 
   text-align:center; 
   background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
   min-height:100vh;
@@ -100,8 +100,9 @@ export default {
 }
 .service-card { 
   background:#111; 
-  padding:40px 30px; 
-  width:320px; 
+  padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1.25rem, 4vw, 2rem); 
+  width: clamp(280px, 90%, 320px); 
+  max-width: 100%;
   border-radius:25px; 
   text-align:left; 
   transition:0.4s;
@@ -171,9 +172,9 @@ export default {
 }
 .modal-content {
   background:#111;
-  padding:60px 50px;
+  padding: clamp(2rem, 8vw, 3.75rem) clamp(1.5rem, 6vw, 3.125rem);
   border-radius:25px;
-  max-width:600px;
+  max-width: min(95vw, 600px);
   max-height:80vh;
   overflow-y:auto;
   position:relative;
@@ -225,9 +226,18 @@ export default {
   margin:0 auto;
 }
 
+/* RESPONSIVE Enhanced */
+@media (max-width: 1024px) {
+  .services-grid { gap: clamp(1rem, 5vh, 1.875rem); }
+}
+
 @media (max-width: 768px) {
-  .services-hero { padding:60px 20px; }
-  .services-grid { flex-direction:column; align-items:center; }
-  .modal-content { padding:40px 25px; margin:20px; }
+  .services-hero { padding-top: clamp(2.5rem, 8vh, 3.75rem); }
+  .services-grid { flex-direction:column; align-items:center; gap: 1.5rem; }
+  .modal-content { padding-bottom: clamp(1rem, 5vh, 1.5rem); margin: clamp(1rem, 4vw, 1.25rem); }
+}
+
+@media (max-width: 480px) {
+  .service-icon { width: clamp(50px, 12vw, 60px); height: clamp(50px, 12vw, 60px); font-size: clamp(1.25rem, 6vw, 1.5rem); }
 }
 </style>

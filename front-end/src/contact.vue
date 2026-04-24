@@ -3,126 +3,125 @@
     <div class="contact-container">
       <div class="contact-header">
         <h1>Get In Touch</h1>
-        <p>Have a project? Let's talk. Fill out the form below and I'll get back to you.</p>
+        <p>Have a project? Let's talk.</p>
       </div>
 
-      <form class="contact-form" @submit.prevent="submitForm">
+      <form class="contact-form" @submit.prevent="handleSubmit">
         <div class="form-row">
           <div class="form-group">
-            <label for="fullName">Full Name *</label>
-            <input 
-              id="fullName" 
-              v-model="form.fullName" 
-              type="text" 
-              required
-              placeholder="Enter your full name"
-            >
+            <label>Full Name</label>
+            <input v-model="formData.fullName" type="text" required>
           </div>
+
           <div class="form-group">
-            <label for="phone">Contact Number *</label>
-            <input 
-              id="phone" 
-              v-model="form.phone" 
-              type="tel" 
-              required
-              placeholder="e.g. +27 123 456 789"
-            >
+            <label>Phone</label>
+            <input v-model="formData.phone" type="tel" required>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input 
-            id="email" 
-            v-model="form.email" 
-            type="email" 
-            required
-            placeholder="your.email@example.com"
-          >
-        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input v-model="formData.email" type="email" required>
+          </div>
 
-        <div class="form-group">
-          <label for="message">Message *</label>
-          <textarea 
-            id="message" 
-            v-model="form.message" 
-            required
-            rows="6"
-            placeholder="Tell me about your project..."
-          ></textarea>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea v-model="formData.message" required></textarea>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn" :disabled="loading">
           {{ loading ? 'Sending...' : 'Send Message' }}
         </button>
-      </form>
 
-      <div v-if="status" class="status-message" :class="status.type">
-        {{ status.message }}
-      </div>
+        <div v-if="status" class="status-message" :class="status.type">
+          {{ status.message }}
+        </div>
+      </form>
     </div>
   </section>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      form: {
-        fullName: '',
-        phone: '',
-        email: '',
-        message: ''
-      },
-      loading: false,
-      status: null
+<script setup>
+import { ref } from 'vue'
+
+const formData = ref({
+  fullName: '',
+  phone: '',
+  email: '',
+  message: ''
+})
+
+const loading = ref(false)
+const status = ref(null)
+
+const SERVICE_ID = 'service_9pbccv5'
+const TEMPLATE_ID = 'template_kpdbvqu'
+
+const openMailtoFallback = () => {
+  const subject = encodeURIComponent(`Portfolio Contact: ${formData.value.fullName}`)
+  const body = encodeURIComponent(
+    `Name: ${formData.value.fullName}\n` +
+    `Phone: ${formData.value.phone}\n` +
+    `Email: ${formData.value.email}\n\n` +
+    `Message:\n${formData.value.message}`
+  )
+  window.open(`mailto:samnkelisiwe@gmail.com?subject=${subject}&body=${body}`, '_blank')
+}
+
+const handleSubmit = async () => {
+  if (!formData.value.fullName || !formData.value.email || !formData.value.message) {
+    status.value = { type: 'error', message: 'Please fill all required fields.' }
+    return
+  }
+
+  loading.value = true
+  status.value = null
+
+  try {
+    const templateParams = {
+      from_name: formData.value.fullName,
+      fullName: formData.value.fullName,
+      name: formData.value.fullName,
+      phone: formData.value.phone,
+      contact_number: formData.value.phone,
+      from_email: formData.value.email,
+      email: formData.value.email,
+      reply_to: formData.value.email,
+      message: formData.value.message
     }
-  },
-  methods: {
-    async submitForm() {
-      this.loading = true;
-      this.status = null;
 
-      try {
-fetch('http://localhost:3001/api/contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.form)
-        });
+    const result = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+    console.log('EmailJS success:', result)
 
-        const data = await response.json();
-
-        if (data.success) {
-          this.form = { fullName: '', phone: '', email: '', message: '' };
-          this.status = {
-            type: 'success',
-            message: '✅ Message sent to my email! I\'ll reply within 24 hours.'
-          };
-        } else {
-          throw new Error(data.message || 'Server error');
-        }
-      } catch (error) {
-        console.error('Submit error:', error);
-        this.status = {
-          type: 'error',
-          message: `❌ Failed to send: ${error.message}. Make sure backend server is running.`
-        };
-      } finally {
-        this.loading = false;
-      }
+    status.value = {
+      type: 'success',
+      message: '🎉 Message sent successfully! I will get back to you soon.'
     }
+    formData.value = { fullName: '', phone: '', email: '', message: '' }
+  } catch (error) {
+    console.error('EmailJS error:', error)
+
+    // Fallback to mailto
+    openMailtoFallback()
+
+    status.value = {
+      type: 'success',
+      message: '📧 Email client opened with your message! Please click SEND in your email app.'
+    }
+    formData.value = { fullName: '', phone: '', email: '', message: '' }
+  } finally {
+    loading.value = false
   }
 }
 </script>
 
 <style scoped>
-/* All original styles unchanged */
 .contact {
-  padding:100px 50px;
+  padding: clamp(4rem, 10vh, 6rem) clamp(2rem, 6vw, 3rem);
   min-height:100vh;
-   background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
+  background: radial-gradient(circle at 20% 20%, #0a1f2f, #02060a 70%);
 }
 .contact-container {
   max-width:800px;
@@ -225,10 +224,20 @@ fetch('http://localhost:3001/api/contact', {
   border:1px solid #ff4060;
   color:#ff4060;
 }
-@media (max-width:768px) {
+@media (max-width: 1024px) {
+  .form-row { gap: 1.25rem; }
+}
+
+@media (max-width: 768px) {
   .contact { padding:60px 20px; }
   .form-row { grid-template-columns:1fr; }
   .contact-form { padding:30px 20px; }
+}
+
+@media (max-width: 480px) {
+  .contact-header h1 { font-size: clamp(2.5rem, 10vw, 3.5rem); }
+  .submit-btn { padding: 16px; min-height: 52px; font-size: 16px; }
+  .form-group input, .form-group textarea { padding: 16px; min-height: 52px; }
 }
 </style>
 
